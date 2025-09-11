@@ -37,6 +37,7 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         .app-header {
@@ -50,7 +51,7 @@
         }
 
         .app-header h1 {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -73,6 +74,14 @@
             background: rgba(255, 255, 255, 0.1);
             padding: 10px 5px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .bottom-tab-navigation::-webkit-scrollbar {
+            display: none;
         }
 
         .tab-btn {
@@ -89,6 +98,7 @@
             font-size: 0.7rem;
             transition: all 0.3s ease;
             min-width: 60px;
+            flex-shrink: 0;
         }
 
         .tab-btn.active {
@@ -124,19 +134,20 @@
         }
 
         .total-expenses h2 {
-            font-size: 1rem;
+            font-size: 0.9rem;
             margin-bottom: 10px;
             font-weight: 500;
         }
 
         .total-expenses .amount {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             margin-bottom: 5px;
+            letter-spacing: 0.5px;
         }
 
         .section-title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             margin: 20px 0 15px;
             font-weight: 600;
         }
@@ -157,9 +168,10 @@
         }
 
         .monthly-item .amount {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: 700;
             margin-bottom: 5px;
+            letter-spacing: 0.5px;
         }
 
         .monthly-item p {
@@ -203,20 +215,24 @@
 
         .expense-title {
             font-weight: 500;
+            font-size: 0.95rem;
         }
 
         .expense-category, .expense-date {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             opacity: 0.8;
         }
 
         .expense-amount {
             font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
         }
 
         .subtitle {
             opacity: 0.8;
             margin-bottom: 20px;
+            font-size: 0.9rem;
         }
 
         .form-group {
@@ -227,6 +243,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
+            font-size: 0.9rem;
         }
 
         input, select {
@@ -236,6 +253,8 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             background: rgba(255, 255, 255, 0.1);
             color: white;
+            font-size: 0.9rem;
+            vertical-align: text-top;
         }
 
         input::placeholder {
@@ -248,9 +267,10 @@
 
         .input-icon {
             position: absolute;
-            left: 15px;
+            left: 10px;
             top: 50%;
             transform: translateY(-50%);
+            font-size: 0.9rem;
         }
 
         .input-with-icon input {
@@ -268,12 +288,13 @@
             flex-direction: column;
             align-items: center;
             gap: 5px;
-            padding: 12px;
+            padding: 10px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             color: white;
             cursor: pointer;
+            font-size: 0.8rem;
         }
 
         .category-btn.active {
@@ -289,7 +310,7 @@
 
         .submit-btn {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             background: rgba(255, 255, 255, 0.2);
             border: none;
             border-radius: 12px;
@@ -300,6 +321,7 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            font-size: 0.9rem;
         }
 
         .month-selector {
@@ -307,6 +329,9 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+        }
+        .month-selector h2 {
+            font-size: 20px;
         }
 
         .month-nav-btn {
@@ -334,14 +359,15 @@
         }
 
         .budget-info h3 {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-bottom: 5px;
             font-weight: 500;
         }
 
         .budget-info .amount {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
         .budget-bar {
@@ -360,14 +386,14 @@
 
         .budget-usage {
             text-align: right;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .category-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: 12px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             margin-bottom: 10px;
@@ -376,16 +402,17 @@
         .category-details {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .category-icon {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 0.9rem;
         }
 
         .category-icon.entertainment {
@@ -393,17 +420,24 @@
             color: #fd79a8;
         }
 
+        .category-icon.food {
+            background: rgba(255, 177, 66, 0.2);
+            color: #ffb142;
+        }
+
         .category-name {
             font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .category-amount {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             opacity: 0.8;
         }
 
         .category-percentage {
             font-weight: 700;
+            font-size: 0.9rem;
         }
 
         .search-container {
@@ -426,7 +460,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: 12px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             margin-bottom: 10px;
@@ -434,19 +468,22 @@
 
         .report-date {
             font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .report-amount {
             font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
         }
 
         .report-details-btn {
             background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             cursor: pointer;
         }
 
@@ -460,20 +497,28 @@
             margin-bottom: 15px;
         }
 
+        .notification-info {
+            flex: 1;
+            margin-right: 15px;
+        }
+
         .notification-title {
             font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
         }
 
         .notification-time {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             opacity: 0.8;
         }
 
         .switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 24px;
+            width: 44px;
+            height: 22px;
+            flex-shrink: 0;
         }
 
         .switch input {
@@ -499,8 +544,8 @@
             content: "";
             height: 16px;
             width: 16px;
-            left: 4px;
-            bottom: 4px;
+            left: 3px;
+            bottom: 3px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
@@ -511,7 +556,7 @@
         }
 
         input:checked + .slider:before {
-            transform: translateX(26px);
+            transform: translateX(22px);
         }
 
         .add-notification-btn {
@@ -527,6 +572,42 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .notification-form {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .notification-form .form-group {
+            margin-bottom: 15px;
+        }
+
+        .notification-form-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .notification-form-buttons button {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .notification-form-buttons .save-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .notification-form-buttons .cancel-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
         }
 
         .sound-settings {
@@ -536,6 +617,7 @@
         .sound-settings h3 {
             margin-bottom: 10px;
             font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .sound-select {
@@ -544,7 +626,7 @@
 
         .save-settings-btn {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             background: rgba(255, 255, 255, 0.2);
             border: none;
             border-radius: 12px;
@@ -552,11 +634,39 @@
             font-weight: 600;
             cursor: pointer;
             margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Toast notification */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+        }
+
+        .toast-notification i {
+            color: #43e97b;
         }
 
         /* Responsive adjustments */
-        @media (max-width: 400px) {
-            .app-header h1 .logo-text {
+        @media (max-width: 460px) {
+            .app-header {
                 display: none;
             }
             
@@ -582,6 +692,32 @@
             .budget-info {
                 grid-template-columns: 1fr;
                 gap: 10px;
+            }
+
+            .total-expenses .amount {
+                font-size: 1.6rem;
+            }
+
+            .monthly-item .amount {
+                font-size: 1.1rem;
+            }
+
+            .expense-amount {
+                font-size: 0.9rem;
+            }
+
+            body {
+                align-items: flex-start;
+                padding: 0px;
+            }
+            .app-container {
+                height: 100vh;
+                border-radius: 0;
+                border: none;
+                box-shadow: none;
+            }
+            .app-main {
+                padding: 30px 15px 15px;
             }
         }
 
@@ -765,7 +901,7 @@
                         </div>
                         <div class="category-item">
                             <div class="category-details">
-                                <div class="category-icon entertainment">
+                                <div class="category-icon food">
                                     <i class="fas fa-utensils"></i>
                                 </div>
                                 <div>
@@ -859,7 +995,22 @@
                             </label>
                         </div>
 
-                        <button class="add-notification-btn">
+                        <div id="new-notification-form" class="notification-form" style="display: none;">
+                            <div class="form-group">
+                                <label for="notification-title">Notification Title</label>
+                                <input type="text" id="notification-title" placeholder="Enter title">
+                            </div>
+                            <div class="form-group">
+                                <label for="notification-time">Time</label>
+                                <input type="time" id="notification-time">
+                            </div>
+                            <div class="notification-form-buttons">
+                                <button type="button" class="save-btn" id="save-notification">Save</button>
+                                <button type="button" class="cancel-btn" id="cancel-notification">Cancel</button>
+                            </div>
+                        </div>
+
+                        <button class="add-notification-btn" id="show-notification-form">
                             <i class="fas fa-plus"></i>
                             Add New Notification
                         </button>
@@ -931,6 +1082,11 @@
         </div>
     </div>
 
+    <div class="toast-notification" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Settings saved successfully!</span>
+    </div>
+
     <script>
         // Tab Switching Functionality
         document.querySelectorAll('.tab-btn').forEach(button => {
@@ -965,11 +1121,24 @@
             const ampm = hours >= 12 ? 'PM' : 'AM';
             hours = hours % 12;
             hours = hours ? hours : 12; // the hour '0' should be '12'
-            const formattedTime = `${hours}:${minutes} ${ampm}`;
+            const formattedTime = `${hours}:${minutes}`;
             
             document.getElementById('date').value = formattedDate;
             document.getElementById('time').value = formattedTime;
         });
+
+        // Toast notification function
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
 
         // Form submission
         document.getElementById('expense-form').addEventListener('submit', function(e) {
@@ -992,7 +1161,7 @@
             console.log('Expense added:', { amount, description, category, date: formattedDate, time });
             
             // Show success message
-            alert('Expense added successfully!');
+            showToast('Expense added successfully!');
             
             // Reset form
             this.reset();
@@ -1011,7 +1180,77 @@
             console.log('Settings saved:', { monthlyBudget, salary });
             
             // Show success message
-            alert('Settings saved successfully!');
+            showToast('Settings saved successfully!');
+        });
+
+        // Notification functionality
+        document.getElementById('show-notification-form').addEventListener('click', function() {
+            document.getElementById('new-notification-form').style.display = 'block';
+            this.style.display = 'none';
+        });
+
+        document.getElementById('cancel-notification').addEventListener('click', function() {
+            document.getElementById('new-notification-form').style.display = 'none';
+            document.getElementById('show-notification-form').style.display = 'block';
+            document.getElementById('notification-title').value = '';
+            document.getElementById('notification-time').value = '';
+        });
+
+        document.getElementById('save-notification').addEventListener('click', function() {
+            const title = document.getElementById('notification-title').value;
+            const time = document.getElementById('notification-time').value;
+            
+            if (!title || !time) {
+                showToast('Please fill all fields');
+                return;
+            }
+            
+            // Format time to 12-hour format
+            let [hours, minutes] = time.split(':');
+            hours = parseInt(hours);
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            const formattedTime = `${hours}:${minutes} ${ampm}`;
+            
+            // Create new notification element
+            const newNotification = document.createElement('div');
+            newNotification.className = 'notification-item';
+            newNotification.innerHTML = `
+                <div class="notification-info">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-time">${formattedTime}</div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider"></span>
+                </label>
+            `;
+            
+            // Insert before the form
+            document.getElementById('new-notification-form').parentNode.insertBefore(newNotification, document.getElementById('new-notification-form'));
+            
+            // Hide form and show button again
+            document.getElementById('new-notification-form').style.display = 'none';
+            document.getElementById('show-notification-form').style.display = 'block';
+            
+            // Reset form
+            document.getElementById('notification-title').value = '';
+            document.getElementById('notification-time').value = '';
+            
+            // Add event listener to the new switch
+            newNotification.querySelector('input[type="checkbox"]').addEventListener('change', function() {
+                showToast(this.checked ? 'Notification enabled' : 'Notification disabled');
+            });
+            
+            showToast('Notification added successfully!');
+        });
+
+        // Add event listeners to existing notification toggles
+        document.querySelectorAll('.notification-item .switch input').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                showToast(this.checked ? 'Notification enabled' : 'Notification disabled');
+            });
         });
     </script>
 </body>
