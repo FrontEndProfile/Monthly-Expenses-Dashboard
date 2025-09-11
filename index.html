@@ -576,6 +576,7 @@
         .notification-info {
             flex: 1;
             margin-right: 15px;
+            position: relative;
         }
 
         .notification-title {
@@ -666,6 +667,7 @@
         .notification-form-buttons {
             display: flex;
             gap: 10px;
+            position: relative;
         }
 
         .notification-form-buttons button {
@@ -688,6 +690,7 @@
 
         .sound-settings {
             margin-top: 20px;
+            position: relative;
         }
 
         .sound-settings h3 {
@@ -1220,7 +1223,7 @@
         // Data management
         let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
         let settings = JSON.parse(localStorage.getItem('settings')) || {
-            monthlyBudget: 50000,
+            monthlyBudget: 90000, // Updated to match the image
             salary: 100000
         };
 
@@ -1229,7 +1232,7 @@
             expenses = [
                 {
                     id: Date.now(),
-                    amount: 1500,
+                    amount: 60000,
                     description: "Netflix Subscription",
                     category: "Entertainment",
                     date: "2025-09-05",
@@ -1238,7 +1241,7 @@
                 },
                 {
                     id: Date.now() + 1,
-                    amount: 3500,
+                    amount: 9500,
                     description: "Dinner at Restaurant",
                     category: "Food",
                     date: "2025-09-10",
@@ -1346,52 +1349,48 @@
             const total = expenses.reduce((sum, exp) => sum + parseInt(exp.amount), 0);
             document.getElementById('total-expenses-amount').textContent = formatCurrency(total);
             
-            // Update monthly overview
+            // Update monthly overview - Only show current month
             const monthlyOverview = document.getElementById('monthly-overview');
             monthlyOverview.innerHTML = '';
             
-            // Group expenses by month
-            const months = {};
-            expenses.forEach(exp => {
-                const date = new Date(exp.date);
-                const monthYear = getMonthYearString(date);
-                
-                if (!months[monthYear]) {
-                    months[monthYear] = {
-                        total: 0,
-                        count: 0
-                    };
-                }
-                
-                months[monthYear].total += parseInt(exp.amount);
-                months[monthYear].count++;
-            });
+            // Get current month
+            const now = new Date();
+            const currentMonthKey = getMonthYearString(now);
             
-            // Display last 3 months
-            const sortedMonths = Object.keys(months).sort((a, b) => {
-                return new Date(b.split('-')[1], getMonthIndex(b.split('-')[0])) - 
-                       new Date(a.split('-')[1], getMonthIndex(a.split('-')[0]));
-            }).slice(0, 3);
+            // Calculate expenses for current month only
+            const currentMonthExpenses = getExpensesByMonth(now.getMonth(), now.getFullYear());
+            const monthTotal = currentMonthExpenses.reduce((sum, exp) => sum + parseInt(exp.amount), 0);
+            const usagePercentage = settings.monthlyBudget > 0 
+                ? Math.round((monthTotal / settings.monthlyBudget) * 100) 
+                : 0;
             
-            sortedMonths.forEach(month => {
-              const monthData = months[month];
-              const usagePercentage = settings.monthlyBudget > 0 
-                  ? Math.round((monthData.total / settings.monthlyBudget) * 100) 
-                  : 0;
-              
-              const monthElement = document.createElement('div');
-              monthElement.className = 'glass-card monthly-item';
-              monthElement.innerHTML = `
-                  <h3>${month}</h3>
-                  <div class="amount">${formatCurrency(monthData.total)}</div>
-                  <div class="budget-info">
-                      <div class="budget-label">Budget: ${formatCurrency(settings.monthlyBudget)}</div>
-                      <div class="budget-usage">${usagePercentage}% Used</div>
-                  </div>
-                  <p>${monthData.count} transactions</p>
-                  <button class="view-details-btn">View Details</button>
-              `;
-              monthlyOverview.appendChild(monthElement);
+            // Create card for current month only
+            const monthElement = document.createElement('div');
+            monthElement.className = 'glass-card monthly-item';
+            monthElement.innerHTML = `
+                <h3>${currentMonthKey}</h3>
+                <div class="amount">${formatCurrency(monthTotal)}</div>
+                <div class="budget-info">
+                    <div class="budget-label">Budget: ${formatCurrency(settings.monthlyBudget)}</div>
+                    <div class="budget-usage">${usagePercentage}% Used</div>
+                </div>
+                <p>${currentMonthExpenses.length} transactions</p>
+                <button class="view-details-btn" id="view-month-details">View Details</button>
+            `;
+            monthlyOverview.appendChild(monthElement);
+            
+            // Add event listener to view details button
+            document.getElementById('view-month-details').addEventListener('click', () => {
+                // Switch to monthly report tab
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                
+                document.querySelector('[data-tab="monthly-report"]').classList.add('active');
+                document.getElementById('monthly-report').classList.add('active');
+                
+                // Set the monthly report to current month
+                currentReportMonth = new Date();
+                updateMonthlyReport();
             });
             
             // Update recent expenses
@@ -1467,7 +1466,6 @@
             document.getElementById('budget-progress').style.width = `${Math.min(100, budgetUsage)}%`;
             document.getElementById('budget-usage').textContent = `${Math.round(budgetUsage)}%`;
             
-            // Update categories
             // Update categories
             const categoriesList = document.getElementById('categories-list');
             categoriesList.innerHTML = '';
@@ -1755,6 +1753,7 @@
                 
                 localStorage.setItem('settings', JSON.stringify(settings));
                 updateMonthlyReport();
+                updateDashboard();
                 showToast('Settings saved successfully!');
             });
             
