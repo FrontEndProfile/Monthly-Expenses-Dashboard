@@ -1201,6 +1201,15 @@
                       </div>
                     </div>
 
+                    <!-- Optional helpers -->
+                    <button id="enable-notifs" class="add-notification-btn">
+                      <i class="fas fa-bell"></i> Enable Notifications
+                    </button>
+
+                    <button id="test-notif" class="add-notification-btn">
+                      <i class="fas fa-paper-plane"></i> Send Test Notification
+                    </button>
+
 
                 </div>
             </div>
@@ -2107,6 +2116,110 @@
 
 
     </script>
+
+
+    <script>
+    // --- Permission helper (user gesture se call karna best) ---
+    async function askNotifPermissionOnce() {
+      if (!('Notification' in window)) {
+        alert('Notifications not supported on this browser.');
+        return;
+      }
+      if (Notification.permission === 'default') {
+        try { await Notification.requestPermission(); } catch {}
+      }
+    }
+
+    // --- Trigger via Service Worker so OS default sound play ho (Android PWA etc.) ---
+    async function triggerNotification(title, body = 'Expense App Alert') {
+      const options = {
+        body,
+        icon: './icon-192.png',
+        badge: './icon-192.png',
+        tag: 'expense-reminder',     // de-dup within same minute
+        renotify: false,
+        timestamp: Date.now()
+      };
+
+      if ('serviceWorker' in navigator) {
+        try {
+          const reg = await navigator.serviceWorker.getRegistration();
+          if (reg) { await reg.showNotification(title, options); return; }
+        } catch (e) {}
+      }
+
+      if (Notification.permission === 'granted') {
+        new Notification(title, options);  // page-foreground fallback
+      }
+    }
+
+    // --- Simple minute scheduler (works while page/PWA is running) ---
+    function toHHMM(d = new Date()) {
+      const h = String(d.getHours()).padStart(2, '0');
+      const m = String(d.getMinutes()).padStart(2, '0');
+      return `${h}:${m}`;
+    }
+
+    let lastFiredKey = '';
+    function checkAndFire() {
+      const now = toHHMM();
+      const list = JSON.parse(localStorage.getItem('notifications')) || [];
+      list.forEach(n => {
+        if (!n.enabled) return;
+        if (n.time === now) {
+          const key = `${n.id}@${now}`;
+          if (lastFiredKey !== key) {
+            lastFiredKey = key;
+            triggerNotification(n.title, `It's time for: ${n.title}`);
+          }
+        }
+      });
+    }
+
+    function startNotificationScheduler() {
+      checkAndFire();                       // immediate check
+      setInterval(checkAndFire, 60_000);    // every minute
+    }
+
+    // --- Hook UI buttons ---
+    document.addEventListener('DOMContentLoaded', () => {
+      // Disable custom sound UI (we use device default)
+      const soundWrap = document.querySelector('.sound-settings');
+      if (soundWrap) {
+        const sel = soundWrap.querySelector('select');
+        if (sel) { sel.disabled = true; sel.style.opacity = .6; }
+        const note = document.createElement('div');
+        note.style.fontSize = '.85rem';
+        note.style.opacity = '.8';
+        note.style.marginTop = '6px';
+        note.textContent =
+          "This app uses your phone/PC's default notification sound. Change it from system settings.";
+        soundWrap.appendChild(note);
+      }
+
+      const enableBtn = document.getElementById('enable-notifs');
+      if (enableBtn) {
+        enableBtn.addEventListener('click', async () => {
+          await askNotifPermissionOnce();
+          alert('Notifications permission: ' + Notification.permission);
+        });
+      }
+
+      const testBtn = document.getElementById('test-notif');
+      if (testBtn) {
+        testBtn.addEventListener('click', async () => {
+          await askNotifPermissionOnce();
+          triggerNotification('Test Notification', 'Looks good! ✅');
+        });
+      }
+
+      // Autostart scheduler
+      startNotificationScheduler();
+    });
+    </script>
+
+
+
 
 
 </body>
