@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monthly Expense</title>
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#6a11cb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Monthly Expense">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSIjNkExMUNCIi8+CjxwYXRoIGQ9Ik05NiAxNDRMMTQ0IDk2TDk2IDQ4TDQ4IDk2TDk2IDE0NFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0xMjggMTI4TDE2MCA5NkwxMjggNjRMMTI4IDEyOFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik02NCAxMjhMOTYgOTZMNjQgNjRMNjQgMTI4WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+">
+    <link rel="manifest" href="./manifest.webmanifest">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
     <style>
@@ -907,6 +914,21 @@
             cursor: pointer;
             margin-left: 10px;
         }
+        /* Add this new style for the install button */
+        #install-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #install-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -1101,7 +1123,7 @@
                         <h2>Settings</h2>
                         
                         <div class="form-group">
-                            <label for="monthly-budget">Monthly Budget (Rs)</label>
+                            <label for="monthly-budget-input">Monthly Budget (Rs)</label>
                             <div class="input-with-icon">
                                 <span class="input-icon">Rs</span>
                                 <input type="number" id="monthly-budget-input" value="50000" step="1000">
@@ -1109,7 +1131,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="salary">Monthly Salary (Rs)</label>
+                            <label for="salary-input">Monthly Salary (Rs)</label>
                             <div class="input-with-icon">
                                 <span class="input-icon">Rs</span>
                                 <input type="number" id="salary-input" value="100000" step="1000">
@@ -1118,6 +1140,15 @@
                         
                         <button class="save-settings-btn" id="save-settings">Save Settings</button>
                     </div>
+                    <div class="glass-card" id="install-card" style="display: none;">
+                      <h2 style="margin-bottom: 12px;">Install on Phone</h2>
+                      <button id="install-btn" style="display: none;">Install App</button>
+                      <div id="install-help" style="display:none; font-size:.85rem; opacity:.85; margin-top:8px;">
+                        Tip: Agar button nahi dikh raha to browser menu se “Add to Home Screen” use karein.
+                      </div>
+                    </div>
+
+
                 </div>
             </div>
         </main>
@@ -1906,5 +1937,96 @@
             });
         });
     </script>
+
+    <script>
+      // PWA Installation Handling (fixed)
+      let deferredPrompt;
+      const installButton = document.getElementById('install-btn');
+      const installCard = document.getElementById('install-card');
+      const installHelp = document.getElementById('install-help');
+
+      // Robust installed check across platforms
+      function isAppInstalled() {
+        // 1) Chrome/Edge etc.
+        const standaloneDisplay = window.matchMedia('(display-mode: standalone)').matches;
+        // 2) iOS Safari
+        const iosStandalone = window.navigator.standalone === true;
+        // 3) Persisted flag after appinstalled (helps when matchMedia fails sometimes)
+        const persistedFlag = localStorage.getItem('pwaInstalled') === '1';
+        return standaloneDisplay || iosStandalone || persistedFlag;
+      }
+
+      // Show/hide entire card, and manage button vs fallback
+      function updateInstallUI() {
+        if (isAppInstalled()) {
+          // App installed -> hide whole card
+          installCard.style.display = 'none';
+          return;
+        }
+
+        // Not installed -> show the card
+        installCard.style.display = 'block';
+
+        // Button visible only if we have a deferredPrompt (Chrome-like)
+        if (deferredPrompt) {
+          installButton.style.display = 'inline-block';
+          if (installHelp) installHelp.style.display = 'none';
+        } else {
+          // No prompt available (e.g., iOS Safari or non-eligible) -> hide button, show help
+          installButton.style.display = 'none';
+          if (installHelp) installHelp.style.display = 'block';
+        }
+      }
+
+      // Listen for the browser install prompt
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        updateInstallUI();
+      });
+
+      // User clicks install
+      installButton.addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+          // Button hide kar do; card appinstalled pe hide ho jayega
+          installButton.style.display = 'none';
+        }
+        deferredPrompt = null; // Prompt can't be reused
+        updateInstallUI();
+      });
+
+      // When app gets installed
+      window.addEventListener('appinstalled', () => {
+        localStorage.setItem('pwaInstalled', '1'); // Persisted flag
+        deferredPrompt = null;
+        console.log('PWA was installed');
+        updateInstallUI(); // Hide card
+      });
+
+      // On load, decide visibility correctly
+      window.addEventListener('load', () => {
+        updateInstallUI();
+      });
+
+      // ✅ REAL service worker registration (no blob)
+      function registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('SW registered:', reg.scope))
+            .catch(err => console.log('SW registration failed:', err));
+        }
+      }
+
+      // ✅ Call only SW registration (manifest now comes from <link rel="manifest">)
+      registerServiceWorker();
+
+
+    </script>
+
+
 </body>
 </html>

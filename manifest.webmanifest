@@ -1,0 +1,23 @@
+{
+  "name": "Monthly Expense Tracker",
+  "short_name": "ExpenseApp",
+  "description": "Track your monthly expenses and manage your budget",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#6a11cb",
+  "theme_color": "#6a11cb",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
