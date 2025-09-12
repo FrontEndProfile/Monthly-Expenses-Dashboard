@@ -930,21 +930,6 @@
             cursor: pointer;
             margin-left: 10px;
         }
-        /* Add this new style for the install button */
-        #install-btn {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        #install-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
 
         /* ✅ body ko lock karne ke liye class */
         body.no-scroll {
@@ -966,6 +951,48 @@
           .modal-content {
             padding-bottom: max(16px, env(safe-area-inset-bottom));
           }
+        }
+
+
+        /* 👇 attention animations */
+        .attention-pulse {
+          animation: pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes pulse {
+          0% { box-shadow: 0 0 0 0 rgba(255,255,255,.35); transform: translateZ(0); }
+          70% { box-shadow: 0 0 0 14px rgba(255,255,255,0); }
+          100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+        }
+
+        /* 👇 tiny arrow nudge on the bell icon */
+        .nudge i.fa-bell::after {
+          content: "  ➜";
+          opacity: .9;
+          display: inline-block;
+          transform: translateX(0);
+          animation: nudgeX 1.2s ease-in-out infinite;
+        }
+        @keyframes nudgeX {
+          0%, 100% { transform: translateX(0); opacity: .9; }
+          50% { transform: translateX(6px); opacity: 1; }
+        }
+
+        /* 👇 glass-card smooth hide */
+        .glass-card.hide-slide {
+          opacity: 0;
+          transform: translateY(-6px);
+          max-height: 0 !important;
+          padding-top: 0 !important;
+          padding-bottom: 0 !important;
+          margin: 0 !important;
+          overflow: hidden;
+          transition: all .35s ease;
+        }
+
+        /* 👇 disabled button look */
+        .btn-disabled {
+          opacity: .55 !important;
+          pointer-events: none !important;
         }
 
     </style>
@@ -1195,21 +1222,33 @@
                     </div>
                     <div class="glass-card" id="install-card" style="display: none;">
                       <h2 style="margin-bottom: 12px;">Install on Phone</h2>
-                      <button id="install-btn" style="display: none;">Install App</button>
+                      <button id="install-btn" style="display: none;" class="add-notification-btn attention-pulse">
+                        <i class="fas fa-download"></i> Install App
+                      </button>
+
                       <div id="install-help" style="display:none; font-size:.85rem; opacity:.85; margin-top:8px;">
                         Tip: Agar button nahi dikh raha to browser menu se “Add to Home Screen” use karein.
                       </div>
                     </div>
 
-                    <!-- Optional helpers -->
-                    <button id="enable-notifs" class="add-notification-btn">
-                      <i class="fas fa-bell"></i> Enable Notifications
-                    </button>
+                    <div class="glass-card">
+                      <h2 style="margin-bottom: 12px;">Stay Updated with Reminders</h2>
+                      <p style="opacity:.85; margin-bottom:15px; font-size:.9rem;">
+                        Allow notifications so we can remind you about your daily expenses and budget alerts.
+                      </p>
 
-                    <button id="test-notif" class="add-notification-btn">
-                      <i class="fas fa-paper-plane"></i> Send Test Notification
-                    </button>
+                      <!-- Optional helpers -->
+                      <button id="enable-notifs" class="add-notification-btn attention-pulse">
+                        <i class="fas fa-bell"></i> Enable Notifications
+                      </button>
 
+                      <button id="test-notif" class="add-notification-btn attention-pulse">
+                        <i class="fas fa-paper-plane"></i> Send Test Notification
+                      </button>
+                    </div>
+
+
+                    
 
                 </div>
             </div>
@@ -2119,103 +2158,152 @@
 
 
     <script>
-    // --- Permission helper (user gesture se call karna best) ---
-    async function askNotifPermissionOnce() {
-      if (!('Notification' in window)) {
-        alert('Notifications not supported on this browser.');
-        return;
-      }
-      if (Notification.permission === 'default') {
-        try { await Notification.requestPermission(); } catch {}
-      }
-    }
-
-    // --- Trigger via Service Worker so OS default sound play ho (Android PWA etc.) ---
-    async function triggerNotification(title, body = 'Expense App Alert') {
-      const options = {
-        body,
-        icon: './icon-192.png',
-        badge: './icon-192.png',
-        tag: 'expense-reminder',     // de-dup within same minute
-        renotify: false,
-        timestamp: Date.now()
-      };
-
-      if ('serviceWorker' in navigator) {
-        try {
-          const reg = await navigator.serviceWorker.getRegistration();
-          if (reg) { await reg.showNotification(title, options); return; }
-        } catch (e) {}
-      }
-
-      if (Notification.permission === 'granted') {
-        new Notification(title, options);  // page-foreground fallback
-      }
-    }
-
-    // --- Simple minute scheduler (works while page/PWA is running) ---
-    function toHHMM(d = new Date()) {
-      const h = String(d.getHours()).padStart(2, '0');
-      const m = String(d.getMinutes()).padStart(2, '0');
-      return `${h}:${m}`;
-    }
-
-    let lastFiredKey = '';
-    function checkAndFire() {
-      const now = toHHMM();
-      const list = JSON.parse(localStorage.getItem('notifications')) || [];
-      list.forEach(n => {
-        if (!n.enabled) return;
-        if (n.time === now) {
-          const key = `${n.id}@${now}`;
-          if (lastFiredKey !== key) {
-            lastFiredKey = key;
-            triggerNotification(n.title, `It's time for: ${n.title}`);
-          }
+      // --- Permission helper (user gesture se call karna best) ---
+      async function askNotifPermissionOnce() {
+        if (!('Notification' in window)) {
+          alert('Notifications not supported on this browser.');
+          return;
         }
+        if (Notification.permission === 'default') {
+          try { await Notification.requestPermission(); } catch {}
+        }
+      }
+
+      // --- Trigger via Service Worker so OS default sound play ho (Android PWA etc.) ---
+      async function triggerNotification(title, body = 'Expense App Alert') {
+        const options = {
+          body,
+          icon: './icon-192.png',
+          badge: './icon-192.png',
+          tag: 'expense-reminder',     // de-dup within same minute
+          renotify: false,
+          timestamp: Date.now()
+        };
+
+        if ('serviceWorker' in navigator) {
+          try {
+            const reg = await navigator.serviceWorker.getRegistration();
+            if (reg) { await reg.showNotification(title, options); return; }
+          } catch (e) {}
+        }
+
+        if (Notification.permission === 'granted') {
+          new Notification(title, options);  // page-foreground fallback
+        }
+      }
+
+      // --- Simple minute scheduler (works while page/PWA is running) ---
+      function toHHMM(d = new Date()) {
+        const h = String(d.getHours()).padStart(2, '0');
+        const m = String(d.getMinutes()).padStart(2, '0');
+        return `${h}:${m}`;
+      }
+
+      let lastFiredKey = '';
+      function checkAndFire() {
+        const now = toHHMM();
+        const list = JSON.parse(localStorage.getItem('notifications')) || [];
+        list.forEach(n => {
+          if (!n.enabled) return;
+          if (n.time === now) {
+            const key = `${n.id}@${now}`;
+            if (lastFiredKey !== key) {
+              lastFiredKey = key;
+              triggerNotification(n.title, `It's time for: ${n.title}`);
+            }
+          }
+        });
+      }
+
+      function startNotificationScheduler() {
+        checkAndFire();                       // immediate check
+        setInterval(checkAndFire, 60_000);    // every minute
+      }
+
+      // --- UI helpers: hide the "Enable Notifications" card when permission is granted ---
+      function hideNotifCardIfGranted() {
+        const enableBtn = document.getElementById('enable-notifs');
+        if (!enableBtn) return;
+
+        const card = enableBtn.closest('.glass-card');
+        if (!card) return;
+
+        if (Notification && Notification.permission === 'granted') {
+          // Hide the whole card
+          card.style.display = 'none';
+        } else {
+          // Make sure it shows if not granted
+          card.style.display = '';
+        }
+      }
+
+      function refreshEnableButtonState() {
+        const enableBtn = document.getElementById('enable-notifs');
+        if (!enableBtn) return;
+
+        if (Notification && Notification.permission === 'granted') {
+          enableBtn.innerHTML = '<i class="fas fa-check-circle"></i> Notifications Enabled';
+          enableBtn.classList.remove('attention-pulse');
+          enableBtn.disabled = true;
+        } else if (Notification && Notification.permission === 'denied') {
+          enableBtn.innerHTML = '<i class="fas fa-bell-slash"></i> Notifications Blocked';
+          enableBtn.classList.remove('attention-pulse');
+          enableBtn.disabled = true;
+        } else {
+          enableBtn.innerHTML = '<i class="fas fa-bell"></i> Enable Notifications';
+          enableBtn.classList.add('attention-pulse');
+          enableBtn.disabled = false;
+        }
+      }
+
+      // --- Hook UI buttons ---
+      document.addEventListener('DOMContentLoaded', () => {
+        // Disable custom sound UI (we use device default)
+        const soundWrap = document.querySelector('.sound-settings');
+        if (soundWrap) {
+          const sel = soundWrap.querySelector('select');
+          if (sel) { sel.disabled = true; sel.style.opacity = .6; }
+          const note = document.createElement('div');
+          note.style.fontSize = '.85rem';
+          note.style.opacity = '.8';
+          note.style.marginTop = '6px';
+          note.textContent =
+            "This app uses your phone/PC's default notification sound. Change it from system settings.";
+          soundWrap.appendChild(note);
+        }
+
+        const enableBtn = document.getElementById('enable-notifs');
+        if (enableBtn) {
+          enableBtn.addEventListener('click', async () => {
+            await askNotifPermissionOnce();
+            refreshEnableButtonState();
+            hideNotifCardIfGranted();
+            // (Optional) quick feedback
+            if (Notification && Notification.permission === 'granted') {
+              triggerNotification('Notifications Enabled', 'You will receive reminders.');
+            } else if (Notification && Notification.permission === 'denied') {
+              alert('Notifications are blocked. Enable from browser settings.');
+            }
+          });
+        }
+
+        const testBtn = document.getElementById('test-notif');
+        if (testBtn) {
+          testBtn.addEventListener('click', async () => {
+            await askNotifPermissionOnce();
+            refreshEnableButtonState();
+            hideNotifCardIfGranted();
+            triggerNotification('Test Notification', 'Looks good! ✅');
+          });
+        }
+
+        // Initial state on load
+        refreshEnableButtonState();
+        hideNotifCardIfGranted();
+
+        // Autostart scheduler
+        startNotificationScheduler();
       });
-    }
-
-    function startNotificationScheduler() {
-      checkAndFire();                       // immediate check
-      setInterval(checkAndFire, 60_000);    // every minute
-    }
-
-    // --- Hook UI buttons ---
-    document.addEventListener('DOMContentLoaded', () => {
-      // Disable custom sound UI (we use device default)
-      const soundWrap = document.querySelector('.sound-settings');
-      if (soundWrap) {
-        const sel = soundWrap.querySelector('select');
-        if (sel) { sel.disabled = true; sel.style.opacity = .6; }
-        const note = document.createElement('div');
-        note.style.fontSize = '.85rem';
-        note.style.opacity = '.8';
-        note.style.marginTop = '6px';
-        note.textContent =
-          "This app uses your phone/PC's default notification sound. Change it from system settings.";
-        soundWrap.appendChild(note);
-      }
-
-      const enableBtn = document.getElementById('enable-notifs');
-      if (enableBtn) {
-        enableBtn.addEventListener('click', async () => {
-          await askNotifPermissionOnce();
-          alert('Notifications permission: ' + Notification.permission);
-        });
-      }
-
-      const testBtn = document.getElementById('test-notif');
-      if (testBtn) {
-        testBtn.addEventListener('click', async () => {
-          await askNotifPermissionOnce();
-          triggerNotification('Test Notification', 'Looks good! ✅');
-        });
-      }
-
-      // Autostart scheduler
-      startNotificationScheduler();
-    });
     </script>
 
 
