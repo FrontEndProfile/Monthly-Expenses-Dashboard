@@ -195,7 +195,6 @@
             margin: 8px 0;
             font-size: 0.8rem;
         }
-
         .monthly-item .budget-label {
             opacity: 0.8;
         }
@@ -793,7 +792,6 @@
             }
             
             .budget-info {
-                grid-template-columns: 1fr;
                 gap: 10px;
             }
 
@@ -995,6 +993,154 @@
           pointer-events: none !important;
         }
 
+
+        /* ===== Month Overview (Dashboard) ===== */
+        .monthly-item.mo-card {
+          text-align: left;
+          padding: 16px 16px 14px;
+          border-radius: 16px;
+        }
+
+        .mo-header {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 8px;
+        }
+
+        .mo-month {
+          font-weight: 500;
+          letter-spacing: .4px;
+          font-size: .95rem;
+          padding: 6px 25px;
+          border-radius: 999px;
+          background: rgba(255,255,255,.14);
+          border: 1px solid rgba(255,255,255,.16);
+        }
+
+        .mo-amount {
+          font-size: 1.35rem;
+          font-weight: 700;
+          text-align: center;
+          margin: 6px 0 10px;
+          letter-spacing: .3px;
+        }
+
+        .mo-subrow {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          align-items: center;
+          font-size: .85rem;
+          gap: 8px;
+          margin-bottom: 8px;
+        }
+
+        .mo-budget { opacity: .85; }
+
+        .mo-used-badge {
+          padding: 4px 10px;
+          border-radius: 999px;
+          font-weight: 600;
+          font-size: .8rem;
+          background: rgba(255,255,255,.14);
+          border: 1px solid rgba(255,255,255,.16);
+        }
+        .mo-used-badge.ok    { color: #b7ffd9; border-color: rgba(67,233,123,.35); }
+        .mo-used-badge.warn  { color: #ffe9ad; border-color: rgba(255,200,87,.35); }
+        .mo-used-badge.danger{ color: #ffd0d0; border-color: rgba(255,107,107,.35); }
+
+        .mo-progress {
+          height: 8px;
+          border-radius: 999px;
+          background: rgba(255,255,255,.14);
+          overflow: hidden;
+          margin: 6px 0 8px;
+        }
+        .mo-progress-fill {
+          height: 100%;
+          width: 0%;
+          background: linear-gradient(90deg,#43e97b 0%,#38f9d7 100%);
+        }
+
+        .mo-meta {
+          font-size: .85rem;
+          opacity: .9;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          justify-content: center;
+          margin: 6px 0 16px;
+        }
+        .mo-meta i { opacity: .9; }
+
+        .view-details-btn.mo-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          margin: 0 auto;
+          padding: 6px 16px;
+          font-weight: 500;
+          background: rgba(255,255,255,.18);
+          border: 1px solid rgba(255,255,255,.22);
+        }
+
+        /* Floating Add Expense button on Dashboard */
+        .fab-add-expense {
+          position: absolute;
+          bottom: 75px;   /* above bottom navigation */
+          right: 20px;
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #6a11cb, #2575fc);
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.4rem;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(0,0,0,.25);
+          border: none;
+          z-index: 20;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .fab-add-expense:hover {
+          transform: scale(1.05);
+          box-shadow: 0 6px 16px rgba(0,0,0,.3);
+        }
+
+
+        /* scroll area needs space for the fixed bar */
+        .app-main{
+          padding: 15px;
+          padding-bottom: 90px;                 /* room for the nav */
+        }
+
+        /* fixed bottom nav (centered to your 480px app width) */
+        .bottom-tab-navigation{
+          position: fixed;
+          left: 50%;
+          transform: translateX(-50%);
+          bottom: max(0px, env(safe-area-inset-bottom)); /* iOS safe area */
+          width: min(100vw, 480px);            /* match .app-container width */
+          z-index: 1000;
+
+          display: flex;
+          justify-content: space-around;
+          background: linear-gradient(135deg, #6a11cb 30%, #2575fc 100%);
+          backdrop-filter: blur(10px) !important;
+          -webkit-backdrop-filter: blur(10px);
+          padding: 10px 5px;
+          border-top: 1px solid rgba(255, 255, 255, 0.3);
+          white-space: nowrap;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+        }
+
+        /* (optional) hide scrollbar artifact on some browsers */
+        .bottom-tab-navigation::-webkit-scrollbar{ display:none; }
+
+
+
     </style>
 </head>
 <body>
@@ -1013,7 +1159,7 @@
                         <p>All Time Total</p>
                     </div>
 
-                    <div class="section-title">Monthly Overview</div>
+                    <div class="section-title">Month Overview</div>
                     
                     <div class="monthly-overview" id="monthly-overview">
                         <!-- Will be populated by JavaScript -->
@@ -1025,6 +1171,9 @@
                             <!-- Will be populated by JavaScript -->
                         </div>
                     </div>
+                    <button id="fab-add" class="fab-add-expense">
+                      <i class="fas fa-plus"></i>
+                    </button>
                 </div>
 
                 <!-- Add Expense Tab -->
@@ -1185,7 +1334,7 @@
                             Add New Notification
                         </button>
 
-                        <div class="sound-settings">
+                        <!-- <div class="sound-settings">
                             <h3>Notification Sound</h3>
                             <select class="sound-select">
                                 <option>Default Sound</option>
@@ -1193,7 +1342,7 @@
                                 <option>Bell</option>
                                 <option>Melody</option>
                             </select>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
@@ -1307,22 +1456,35 @@
                 <div class="form-group">
                     <label>Category</label>
                     <div class="category-buttons">
-                        <button type="button" class="category-btn" data-category="Food">
-                            <i class="fas fa-utensils"></i>
-                            <span>Food</span>
-                        </button>
-                        <button type="button" class="category-btn" data-category="Transport">
-                            <i class="fas fa-bus"></i>
-                            <span>Transport</span>
-                        </button>
-                        <button type="button" class="category-btn" data-category="Entertainment">
-                            <i class="fas fa-film"></i>
-                            <span>Entertainment</span>
-                        </button>
-                        <button type="button" class="category-btn" data-category="Shopping">
-                            <i class="fas fa-shopping-bag"></i>
-                            <span>Shopping</span>
-                        </button>
+                      <!-- 1. Food -->
+                      <button type="button" class="category-btn active" data-category="Food">
+                        <i class="fas fa-utensils"></i><span>Food</span>
+                      </button>
+
+                      <!-- 2. Entertainment -->
+                      <button type="button" class="category-btn" data-category="Entertainment">
+                        <i class="fas fa-film"></i><span>Entertainment</span>
+                      </button>
+
+                      <!-- 3. Transport -->
+                      <button type="button" class="category-btn" data-category="Transport">
+                        <i class="fas fa-bus"></i><span>Transport</span>
+                      </button>
+
+                      <!-- 4. Internet Bill -->
+                      <button type="button" class="category-btn" data-category="Internet Bill">
+                        <i class="fas fa-wifi"></i><span>Internet Bill</span>
+                      </button>
+
+                      <!-- 5. Shopping -->
+                      <button type="button" class="category-btn" data-category="Shopping">
+                        <i class="fas fa-shopping-bag"></i><span>Shopping</span>
+                      </button>
+
+                      <!-- 6. Others -->
+                      <button type="button" class="category-btn" data-category="Others">
+                        <i class="fas fa-ellipsis-h"></i><span>Others</span>
+                      </button>
                     </div>
                 </div>
                 
@@ -1566,21 +1728,42 @@
             const currentMonthExpenses = getExpensesByMonth(now.getMonth(), now.getFullYear());
             const monthTotal = currentMonthExpenses.reduce((sum, exp) => sum + parseInt(exp.amount), 0);
             const usagePercentage = settings.monthlyBudget > 0 
-                ? Math.round((monthTotal / settings.monthlyBudget) * 100) 
-                : 0;
-            
-            // Create card for current month only
+              ? Math.round((monthTotal / settings.monthlyBudget) * 100) 
+              : 0;
+
+            const usageClass = usagePercentage >= 90 ? 'danger' 
+                              : usagePercentage >= 70 ? 'warn' 
+                              : 'ok';
+
             const monthElement = document.createElement('div');
-            monthElement.className = 'glass-card monthly-item';
+            monthElement.className = 'glass-card monthly-item mo-card';
             monthElement.innerHTML = `
-                <h3>${currentMonthKey}</h3>
-                <div class="amount">${formatCurrency(monthTotal)}</div>
-                <div class="budget-info">
-                    <div class="budget-label">Budget: ${formatCurrency(settings.monthlyBudget)}</div>
-                    <div class="budget-usage">${usagePercentage}% Used</div>
-                </div>
-                <p>${currentMonthExpenses.length} transactions</p>
-                <button class="view-details-btn" id="view-month-details">View Details</button>
+              <div class="mo-header">
+                <span class="mo-month">${currentMonthKey}</span>
+              </div>
+
+              <div class="mo-amount">${formatCurrency(monthTotal)}</div>
+
+              <div class="mo-subrow">
+                <div class="mo-budget">Budget: ${formatCurrency(settings.monthlyBudget)}</div>
+                <div class="mo-used-badge ${usageClass}">${usagePercentage}% Used</div>
+              </div>
+
+              <div class="mo-progress">
+                <div class="mo-progress-fill" style="width:${Math.min(100, usagePercentage)}%"></div>
+              </div>
+
+              <div class="mo-meta">
+                <i class="fas fa-receipt"></i>
+                ${currentMonthExpenses.length} transactions
+              </div>
+
+              <div style="text-align: center;">
+                <button class="view-details-btn mo-btn" id="view-month-details">
+                  <i class="fas fa-arrow-right"></i> View Details
+                </button>
+              </div
+              
             `;
             monthlyOverview.appendChild(monthElement);
             
@@ -1658,7 +1841,7 @@
                         <h3>Total Spent</h3>
                         <div class="amount" id="monthly-total">${formatCurrency(total)}</div>
                     </div>
-                    <div>
+                    <div style="text-align: end;">
                         <h3>Budget Left</h3>
                         <div class="amount" id="monthly-budget-left">${formatCurrency(Math.max(0, settings.monthlyBudget - total))}</div>
                     </div>
@@ -1784,6 +1967,9 @@
                 return new Date(b.split('-')[1], getMonthIndex(b.split('-')[0])) - 
                        new Date(a.split('-')[1], getMonthIndex(a.split('-')[0]));
             }).forEach(month => {
+                const [monStr, yearStr] = month.split('-');       // e.g. "Sep-2025"
+                const m = getMonthIndex(monStr);
+                const y = parseInt(yearStr, 10);
                 const monthData = months[month];
                 const reportElement = document.createElement('div');
                 reportElement.className = 'report-item';
@@ -1792,6 +1978,11 @@
                     <div class="report-amount">${formatCurrency(monthData.total)}</div>
                     <button class="report-details-btn">View Details</button>
                 `;
+                // Click poori row ya button par kaam kare
+                reportElement.addEventListener('click', (e) => {
+                  // agar andar button click hua hai to bhi same behavior
+                  openMonthlyFor(m, y);
+                });
                 reportsList.appendChild(reportElement);
             });
         }
@@ -2295,9 +2486,43 @@
       });
     </script>
 
+    <script>
+      // Helper: openMonthlyFor(m, y)
+      // 👇 put this near your other helpers
+      function openMonthlyFor(monthIndex, year) {
+        // set target month
+        currentReportMonth = new Date(year, monthIndex, 1);
+
+        // switch tab UI
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+        document.querySelector('[data-tab="monthly-report"]').classList.add('active');
+        document.getElementById('monthly-report').classList.add('active');
+
+        // update view
+        updateMonthlyReport();
+
+        // optional: scroll to top of monthly tab
+        document.querySelector('.app-main')?.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+    </script>
 
 
+    <script>
+      // Floating Add Expense FAB
+      const fabAdd = document.getElementById('fab-add');
+      if (fabAdd) {
+        fabAdd.addEventListener('click', () => {
+          // Switch to Add tab
+          document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+          document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
 
+          document.querySelector('[data-tab="add-expense"]').classList.add('active');
+          document.getElementById('add-expense').classList.add('active');
+        });
+      }
+    </script>
 
 </body>
 </html>
