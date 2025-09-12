@@ -2240,20 +2240,9 @@
       function refreshEnableButtonState() {
         const enableBtn = document.getElementById('enable-notifs');
         if (!enableBtn) return;
-
-        if (Notification && Notification.permission === 'granted') {
-          enableBtn.innerHTML = '<i class="fas fa-check-circle"></i> Notifications Enabled';
-          enableBtn.classList.remove('attention-pulse');
-          enableBtn.disabled = true;
-        } else if (Notification && Notification.permission === 'denied') {
-          enableBtn.innerHTML = '<i class="fas fa-bell-slash"></i> Notifications Blocked';
-          enableBtn.classList.remove('attention-pulse');
-          enableBtn.disabled = true;
-        } else {
           enableBtn.innerHTML = '<i class="fas fa-bell"></i> Enable Notifications';
           enableBtn.classList.add('attention-pulse');
           enableBtn.disabled = false;
-        }
       }
 
       // --- Hook UI buttons ---
