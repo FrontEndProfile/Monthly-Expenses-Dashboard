@@ -375,7 +375,7 @@
 
         .category-btn.active {
             background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.7);
         }
 
         .datetime-inputs {
@@ -503,13 +503,24 @@
 
         .category-icon.transport {
             background: rgba(83, 92, 104, 0.2);
-            color: #535c68;
+            color: #abcfff;
         }
 
         .category-icon.shopping {
             background: rgba(106, 176, 76, 0.2);
             color: #6ab04c;
         }
+
+        .category-icon.internet {
+          background: rgba(52, 172, 224, 0.2);
+          color: #34ace0;
+        }
+
+        .category-icon.others {
+          background: rgba(165, 177, 194, 0.2);
+          color: #eeeeee;
+        }
+
 
         .category-name {
             font-weight: 500;
@@ -744,10 +755,12 @@
             transition: opacity 0.3s ease;
             width: max-content;
             max-width: 85%;
+            display: none;
         }
 
         .toast-notification.show {
             opacity: 1;
+            display: none;
         }
 
         .toast-notification i {
@@ -998,7 +1011,7 @@
                                 <label for="amount">Amount (Rs)</label>
                                 <div class="input-with-icon">
                                     <span class="input-icon">Rs</span>
-                                    <input type="number" id="amount" step="100" min="0" placeholder="0" required>
+                                    <input type="number" id="amount" step="any" min="10" placeholder="0" required>
                                 </div>
                             </div>
                             
@@ -1010,30 +1023,44 @@
                             <div class="form-group">
                                 <label>Category</label>
                                 <div class="category-buttons">
-                                    <button type="button" class="category-btn active" data-category="Food">
-                                        <i class="fas fa-utensils"></i>
-                                        <span>Food</span>
-                                    </button>
-                                    <button type="button" class="category-btn" data-category="Transport">
-                                        <i class="fas fa-bus"></i>
-                                        <span>Transport</span>
-                                    </button>
-                                    <button type="button" class="category-btn" data-category="Entertainment">
-                                        <i class="fas fa-film"></i>
-                                        <span>Entertainment</span>
-                                    </button>
-                                    <button type="button" class="category-btn" data-category="Shopping">
-                                        <i class="fas fa-shopping-bag"></i>
-                                        <span>Shopping</span>
-                                    </button>
+                                  <!-- 1. Food -->
+                                  <button type="button" class="category-btn active" data-category="Food">
+                                    <i class="fas fa-utensils"></i><span>Food</span>
+                                  </button>
+
+                                  <!-- 2. Entertainment -->
+                                  <button type="button" class="category-btn" data-category="Entertainment">
+                                    <i class="fas fa-film"></i><span>Entertainment</span>
+                                  </button>
+
+                                  <!-- 3. Transport -->
+                                  <button type="button" class="category-btn" data-category="Transport">
+                                    <i class="fas fa-bus"></i><span>Transport</span>
+                                  </button>
+
+                                  <!-- 4. Internet Bill -->
+                                  <button type="button" class="category-btn" data-category="Internet Bill">
+                                    <i class="fas fa-wifi"></i><span>Internet Bill</span>
+                                  </button>
+
+                                  <!-- 5. Shopping -->
+                                  <button type="button" class="category-btn" data-category="Shopping">
+                                    <i class="fas fa-shopping-bag"></i><span>Shopping</span>
+                                  </button>
+
+                                  <!-- 6. Others -->
+                                  <button type="button" class="category-btn" data-category="Others">
+                                    <i class="fas fa-ellipsis-h"></i><span>Others</span>
+                                  </button>
                                 </div>
+
                             </div>
                             
                             <div class="form-group">
                                 <label for="date">Date & Time</label>
                                 <div class="datetime-inputs">
                                     <input type="date" id="date" required>
-                                    <input type="time" id="time" required>
+                                    <input type="time" id="time">
                                 </div>
                             </div>
                             
@@ -1220,7 +1247,7 @@
                     <label for="edit-amount">Amount (Rs)</label>
                     <div class="input-with-icon">
                         <span class="input-icon">Rs</span>
-                        <input type="number" id="edit-amount" step="100" min="0" placeholder="0" required>
+                        <input type="number" id="edit-amount" step="any" min="10" placeholder="0" required>
                     </div>
                 </div>
                 
@@ -1722,14 +1749,17 @@
         }
 
         function getCategoryIcon(category) {
-            switch(category) {
-                case 'Food': return 'fas fa-utensils';
-                case 'Transport': return 'fas fa-bus';
-                case 'Entertainment': return 'fas fa-film';
-                case 'Shopping': return 'fas fa-shopping-bag';
-                default: return 'fas fa-dollar-sign';
-            }
+          switch (category) {
+            case 'Food':           return 'fas fa-utensils';
+            case 'Entertainment':  return 'fas fa-film';
+            case 'Transport':      return 'fas fa-bus';
+            case 'Internet Bill':  return 'fas fa-wifi';
+            case 'Shopping':       return 'fas fa-shopping-bag';
+            case 'Others':         return 'fas fa-ellipsis-h';
+            default:               return 'fas fa-dollar-sign';
+          }
         }
+
 
         function getMonthIndex(month) {
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
